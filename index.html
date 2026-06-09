@@ -277,7 +277,7 @@
         </div>
       </div>
       <div class="about-stats reveal">
-        <div class="stat-card"><div class="stat-num" data-target="3">0</div><div class="stat-label">Yrs Industrial<br>Experience</div></div>
+        <div class="stat-card"><div class="stat-num" data-target="5">0</div><div class="stat-label">Yrs Industrial<br>Experience</div></div>
         <div class="stat-card"><div class="stat-num" data-target="8">0</div><div class="stat-label">R&amp;D<br>Projects</div></div>
         <div class="stat-card"><div class="stat-num" data-target="3">0</div><div class="stat-label">Simulation<br>Environments</div></div>
         <div class="stat-card"><div class="stat-num" data-target="4">0</div><div class="stat-label">Industries<br>Spanned</div></div>
@@ -327,11 +327,16 @@
           <div class="exp-tab-date">Jan 2023 - Aug 2023</div>
         </div>
         <div class="exp-tab" data-pane="p3">
+          <div class="exp-tab-role">EV Controls &amp; Validation Eng.</div>
+          <div class="exp-tab-co">HKI Motors</div>
+          <div class="exp-tab-date">Jun 2019 - Jul 2021</div>
+        </div>
+        <div class="exp-tab" data-pane="p4">
           <div class="exp-tab-role">Mechanical Intern</div>
           <div class="exp-tab-co">Maruti Suzuki</div>
           <div class="exp-tab-date">Jul - Dec 2017</div>
         </div>
-        <div class="exp-tab" data-pane="p4">
+        <div class="exp-tab" data-pane="p5">
           <div class="exp-tab-role">Education</div>
           <div class="exp-tab-co">MTU · Pune · MIT xPRO</div>
           <div class="exp-tab-date">2015 - 2026</div>
@@ -383,8 +388,21 @@
           <div class="exp-chips"><span class="chip">MATLAB</span><span class="chip">Python</span><span class="chip">Battery Validation</span><span class="chip">Motor Testing</span><span class="chip">HV Systems</span></div>
         </div>
 
-        <!-- -- MARUTI -- -->
+        <!-- -- HKI MOTORS -- -->
         <div class="exp-pane" id="p3">
+          <div class="exp-role">EV Controls &amp; Validation Engineer</div>
+          <div class="exp-co"><strong>HKI Motors</strong> &nbsp;&middot;&nbsp; India</div>
+          <ul class="exp-pts">
+            <li>Developed BLDC traction control algorithms using Model-Based Design in MATLAB/Simulink; modelled motor dynamics, torque control loops, and regenerative braking logic for an EV powertrain platform</li>
+            <li>Deployed and tested control software on embedded hardware via Rapid Control Prototyping (RCP) using the MotoHawk/Woodward toolchain -- enabling real-time closed-loop iteration without manual code generation</li>
+            <li>Conducted HIL validation against a steady-state dynamometer to characterise motor performance under varying load conditions and validate control response against torque-speed targets</li>
+            <li>Performed system calibration and drive cycle data analysis to refine control parameters and document performance margins</li>
+          </ul>
+          <div class="exp-chips"><span class="chip">MATLAB/Simulink</span><span class="chip">BLDC Control</span><span class="chip">MotoHawk / Woodward</span><span class="chip">RCP</span><span class="chip">HIL Testing</span><span class="chip">Dynamometer</span><span class="chip">Calibration</span><span class="chip">EV Powertrain</span></div>
+        </div>
+
+        <!-- -- MARUTI -- -->
+        <div class="exp-pane" id="p4">
           <div class="exp-role">Mechanical Engineering Intern</div>
           <div class="exp-co"><strong>Maruti Suzuki Pvt. Ltd.</strong> &nbsp;&middot;&nbsp; India</div>
           <ul class="exp-pts">
@@ -396,7 +414,7 @@
         </div>
 
         <!-- -- EDUCATION -- -->
-        <div class="exp-pane" id="p4">
+        <div class="exp-pane" id="p5">
           <div class="exp-role">Education</div>
           <div class="edu-cards">
             <div class="edu-card highlight"><div class="edu-card-title">Professional Certificate – MBSE</div><div class="edu-card-uni">MIT xPRO &nbsp;&middot;&nbsp; Feb 2026 – Jul 2026</div><div class="edu-card-note">System Architecture &middot; DSM &middot; SysML &middot; Systems Thinking</div></div>
@@ -491,19 +509,19 @@ function startTyped() {
     'MBSE Practitioner',
     'Open Source Builder'
   ];
-  var si = 0, ci = 0, del = false, pause = 0;
+  var si = 0, ci = 0, isDeleting = false, pause = 0;
   function tick() {
     if (pause > 0) { pause--; setTimeout(tick, 80); return; }
     var s = strings[si];
-    if (!del) {
+    if (!isDeleting) {
       el.innerHTML = s.slice(0, ci + 1) + '<span class="typed-cursor">|</span>';
       ci++;
-      if (ci === s.length) { del = true; pause = 28; setTimeout(tick, 80); return; }
+      if (ci === s.length) { isDeleting = true; pause = 28; setTimeout(tick, 80); return; }
       setTimeout(tick, 55);
     } else {
       el.innerHTML = s.slice(0, ci - 1) + '<span class="typed-cursor">|</span>';
       ci--;
-      if (ci === 0) { del = false; si = (si + 1) % strings.length; pause = 4; }
+      if (ci === 0) { isDeleting = false; si = (si + 1) % strings.length; pause = 4; }
       setTimeout(tick, 28);
     }
   }
