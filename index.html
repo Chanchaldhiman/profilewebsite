@@ -44,14 +44,35 @@ kbd{font-family:'JetBrains Mono',monospace;font-size:.78em;border:1px solid var(
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
 
-/* ---------- HV conductor / scroll spine ---------- */
-.spine{position:fixed;left:34px;top:90px;bottom:34px;width:2px;background:var(--line);z-index:50;pointer-events:none}
-.spine-fill{position:absolute;top:0;left:0;width:100%;height:0;background:var(--hv)}
-.spine-head{position:absolute;left:50%;transform:translate(-50%,-50%);width:9px;height:9px;border-radius:50%;background:var(--hv);box-shadow:0 0 0 4px rgba(255,77,0,.15),0 0 12px rgba(255,77,0,.6)}
-.spine-tag{position:absolute;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;color:var(--faint)}
-.spine-tag.top{top:-22px}
-.spine-tag.bot{bottom:-22px}
-@media(max-width:1180px){.spine{display:none}}
+/* ---------- HV wire: runs through the page, taps into each section ---------- */
+#wireWrap{position:absolute;top:0;left:0;pointer-events:none;z-index:0;overflow:visible}
+#wireBase{fill:none;stroke:var(--line);stroke-width:2}
+#wireHot{fill:none;stroke:var(--hv);stroke-width:2;filter:drop-shadow(0 0 3px rgba(255,77,0,.45))}
+#wireHead{fill:var(--hv);filter:drop-shadow(0 0 6px rgba(255,77,0,.9))}
+.wire-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;fill:var(--faint)}
+main,header,footer{position:relative;z-index:1}
+.eyebrow::before{transition:box-shadow .3s, background .3s}
+.eyebrow.lit::before{background:var(--hv);box-shadow:0 0 10px rgba(255,77,0,.85);animation:flick .45s steps(3,end) 1}
+.eyebrow.lit{animation:flick .45s steps(3,end) 1}
+@keyframes flick{0%{opacity:.2}40%{opacity:1}60%{opacity:.4}100%{opacity:1}}
+@media(max-width:760px){#wireWrap{display:none}}
+
+/* ---------- AMR: follows the cursor, perceives obstacles ---------- */
+#amr{position:fixed;left:0;top:0;width:48px;height:48px;z-index:90;pointer-events:none;opacity:0;transition:opacity .5s;will-change:transform}
+#amr.show{opacity:1}
+.amr-rot{position:absolute;inset:0}
+.amr-rot svg{overflow:visible;display:block}
+.amr-cone{opacity:.16;transition:opacity .3s}
+.amr-scan{stroke:var(--hv);stroke-width:1.2;opacity:.5;transform-origin:24px 20px;animation:scan 1.7s ease-in-out infinite alternate}
+@keyframes scan{from{transform:rotate(-19deg)}to{transform:rotate(19deg)}}
+#amr.detect .amr-cone{opacity:.34}
+#amr.detect .amr-scan{animation-duration:.55s;opacity:.9}
+#amr.idle .amr-cone{opacity:.06}
+#amr.idle .amr-scan{animation-duration:3.4s;opacity:.25}
+.amr-label{position:absolute;left:50%;top:-20px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;color:var(--hv);white-space:nowrap;opacity:0;transition:opacity .2s}
+#amr.detect .amr-label{opacity:1}
+.amr-toggle{cursor:pointer;background:none;border:none;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;padding:0}
+.amr-toggle:hover{color:var(--hv)}
 
 /* ---------- header ---------- */
 header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -196,11 +217,36 @@ footer{border-top:1px solid var(--line)}
 </head>
 <body>
 
-<!-- HV conductor scroll spine -->
-<div class="spine" aria-hidden="true">
-  <span class="spine-tag top">HV+</span>
-  <div class="spine-fill" id="spineFill"><div class="spine-head" style="top:100%"></div></div>
-  <span class="spine-tag bot">HV−</span>
+<!-- HV wire: energizes as you read, taps into each section -->
+<svg id="wireWrap" aria-hidden="true" width="0" height="0">
+  <path id="wireBase" d=""/>
+  <path id="wireHot" d=""/>
+  <text id="wireTagTop" class="wire-tag">HV+</text>
+  <text id="wireTagBot" class="wire-tag">HV−</text>
+  <circle id="wireHead" r="4.5"/>
+</svg>
+
+<!-- AMR: follows the cursor at a safe standoff, perceives clickable obstacles -->
+<div id="amr" aria-hidden="true">
+  <div class="amr-label">OBJECT DETECTED</div>
+  <div class="amr-rot">
+    <svg viewBox="0 0 48 48" width="48" height="48">
+      <defs>
+        <linearGradient id="coneGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#FF4D00" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#FF4D00" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path class="amr-cone" d="M24 20 L-20.7 -80.5 A110 110 0 0 1 68.7 -80.5 Z" fill="url(#coneGrad)"/>
+      <line class="amr-scan" x1="24" y1="20" x2="24" y2="-86"/>
+      <rect x="10" y="17" width="4" height="13" rx="2" fill="#101214"/>
+      <rect x="34" y="17" width="4" height="13" rx="2" fill="#101214"/>
+      <rect x="13" y="11" width="22" height="27" rx="7" fill="#101214"/>
+      <rect x="17" y="31" width="14" height="3.5" rx="1.75" fill="#3A3F45"/>
+      <circle cx="24" cy="16" r="3.4" fill="#FF4D00"/>
+      <circle cx="24" cy="16" r="1.4" fill="#101214"/>
+    </svg>
+  </div>
 </div>
 
 <header>
@@ -453,7 +499,7 @@ footer{border-top:1px solid var(--line)}
 <footer>
   <div class="ft">
     <span>Chanchal Dhiman <i>·</i> 2026</span>
-    <span>Built by hand, no template <i>·</i> press <kbd>/</kbd> to jump</span>
+    <span>Built by hand, no template <i>·</i> press <kbd>/</kbd> to jump <i>·</i> <button class="amr-toggle" id="amrToggle" type="button">AMR: ON</button></span>
   </div>
 </footer>
 
@@ -517,19 +563,158 @@ document.querySelectorAll('.copy-email').forEach(function(b){
   });
 })();
 
-/* ---------- HV spine scroll progress ---------- */
+/* ---------- HV wire: routed through the page, energizes with scroll ---------- */
 (function(){
-  var fill = document.getElementById('spineFill');
-  if (!fill) return;
-  function upd(){
-    var h = document.documentElement;
-    var max = h.scrollHeight - h.clientHeight;
-    var p = max > 0 ? (h.scrollTop || document.body.scrollTop) / max : 0;
-    fill.style.height = (p * 100).toFixed(2) + '%';
+  var wrap = document.getElementById('wireWrap');
+  var base = document.getElementById('wireBase');
+  var hot  = document.getElementById('wireHot');
+  var head = document.getElementById('wireHead');
+  var tagT = document.getElementById('wireTagTop');
+  var tagB = document.getElementById('wireTagBot');
+  if (!wrap) return;
+  var anchors = [], samples = [], len = 0, built = false;
+
+  function docRect(el){
+    var r = el.getBoundingClientRect();
+    var sy = window.scrollY || document.documentElement.scrollTop;
+    var sx = window.scrollX || 0;
+    return { left: r.left + sx, top: r.top + sy, width: r.width, height: r.height };
   }
-  window.addEventListener('scroll', upd, { passive:true });
-  window.addEventListener('resize', upd);
-  upd();
+
+  function build(){
+    if (window.innerWidth < 760) { wrap.style.display = 'none'; built = false; return; }
+    wrap.style.display = 'block';
+    var H = document.body.scrollHeight;
+    wrap.setAttribute('width', window.innerWidth);
+    wrap.setAttribute('height', H);
+    var main = document.querySelector('main');
+    var contentLeft = docRect(main).left + 28;
+    var gx = Math.max(10, contentLeft - 30);
+
+    var startEl = document.querySelector('.avail');
+    var sr = docRect(startEl);
+    var y0 = sr.top + sr.height / 2;
+    var d = 'M ' + gx + ' ' + y0;
+
+    anchors = [];
+    document.querySelectorAll('.eyebrow').forEach(function(eb){
+      var r = docRect(eb);
+      var ay = r.top + r.height / 2;
+      var ax = r.left - 6;
+      d += ' L ' + gx + ' ' + ay + ' L ' + ax + ' ' + ay + ' L ' + gx + ' ' + ay;
+      anchors.push({ ebEl: eb, y: ay, s: null });
+    });
+
+    var endEl = document.querySelector('.big-mail');
+    var er = docRect(endEl);
+    var yE = er.top + er.height / 2;
+    d += ' L ' + gx + ' ' + yE + ' L ' + (er.left - 16) + ' ' + yE;
+
+    base.setAttribute('d', d);
+    hot.setAttribute('d', d);
+    len = hot.getTotalLength();
+    hot.style.strokeDasharray = len;
+    hot.style.strokeDashoffset = len;
+
+    tagT.setAttribute('x', gx - 10); tagT.setAttribute('y', y0 - 14);
+    tagB.setAttribute('x', gx - 10); tagB.setAttribute('y', yE + 26);
+
+    samples = [];
+    var N = Math.max(220, Math.floor(len / 10));
+    for (var i = 0; i <= N; i++){
+      var s = len * i / N;
+      var p = hot.getPointAtLength(s);
+      samples.push({ s: s, y: p.y });
+    }
+    anchors.forEach(function(a){
+      for (var i = 0; i < samples.length; i++){
+        if (samples[i].y >= a.y - 3) { a.s = samples[i].s; break; }
+      }
+      if (a.s == null) a.s = len;
+    });
+    built = true;
+    upd();
+  }
+
+  function upd(){
+    if (!built) return;
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - doc.clientHeight;
+    var sy = window.scrollY || doc.scrollTop;
+    var targetY = sy + doc.clientHeight * 0.55;
+    var s = 0;
+    for (var i = 0; i < samples.length; i++){
+      if (samples[i].y <= targetY) s = samples[i].s; else break;
+    }
+    if (max > 0 && sy >= max - 2) s = len;
+    hot.style.strokeDashoffset = Math.max(0, len - s);
+    var p = hot.getPointAtLength(s);
+    head.setAttribute('cx', p.x);
+    head.setAttribute('cy', p.y);
+    anchors.forEach(function(a){ a.ebEl.classList.toggle('lit', s >= a.s); });
+  }
+
+  window.addEventListener('scroll', upd, { passive: true });
+  var rT;
+  window.addEventListener('resize', function(){ clearTimeout(rT); rT = setTimeout(build, 120); });
+  document.querySelectorAll('details').forEach(function(dt){
+    dt.addEventListener('toggle', function(){ setTimeout(build, 60); });
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(build, 30); });
+  window.addEventListener('load', build);
+  setTimeout(build, 350);
+})();
+
+/* ---------- AMR: cursor follower with standoff + perception ---------- */
+(function(){
+  if (REDUCED) return;
+  if (!window.matchMedia || !window.matchMedia('(pointer:fine)').matches) return;
+  var amr = document.getElementById('amr');
+  if (!amr) return;
+  var rot = amr.querySelector('.amr-rot');
+  var x = innerWidth / 2, y = innerHeight + 80;   // drives in from below on first move
+  var mx = x, my = y, heading = -Math.PI / 2, lastMove = Date.now(), on = true, shown = false;
+  var STANDOFF = 78;
+
+  document.addEventListener('mousemove', function(e){
+    mx = e.clientX; my = e.clientY; lastMove = Date.now();
+    if (!shown){ shown = true; x = mx; y = Math.min(innerHeight - 40, my + 160); amr.classList.add('show'); }
+  });
+  document.addEventListener('mouseover', function(e){
+    var t = e.target && e.target.closest ? e.target.closest('a,button,summary') : null;
+    amr.classList.toggle('detect', !!t);
+  });
+  var toggle = document.getElementById('amrToggle');
+  if (toggle) toggle.addEventListener('click', function(){
+    on = !on;
+    amr.style.display = on ? 'block' : 'none';
+    toggle.textContent = 'AMR: ' + (on ? 'ON' : 'OFF');
+  });
+
+  function angDiff(a, b){
+    var d = a - b;
+    while (d >  Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    return d;
+  }
+
+  (function loop(){
+    requestAnimationFrame(loop);
+    if (!on || !shown) return;
+    var dx = mx - x, dy = my - y;
+    var dist = Math.hypot(dx, dy);
+    if (dist > 0.5){
+      var ux = dx / dist, uy = dy / dist;
+      // hold a safety standoff from the cursor, like a real AMR
+      var goal = Math.max(0, dist - STANDOFF);
+      x += ux * goal * 0.085;
+      y += uy * goal * 0.085;
+      heading += angDiff(Math.atan2(dy, dx), heading) * 0.14;
+    }
+    amr.classList.toggle('idle', Date.now() - lastMove > 4000);
+    amr.style.transform = 'translate(' + (x - 24) + 'px,' + (y - 24) + 'px)';
+    rot.style.transform = 'rotate(' + (heading * 180 / Math.PI + 90) + 'deg)';
+  })();
 })();
 
 /* ---------- reveal on scroll ---------- */
