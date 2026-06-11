@@ -44,21 +44,20 @@ kbd{font-family:'JetBrains Mono',monospace;font-size:.78em;border:1px solid var(
   *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
 }
 
-/* ---------- HV wire: runs through the page, taps into each section ---------- */
+/* ---------- HV wire: curved conductor routed through the page ---------- */
 #wireWrap{position:absolute;top:0;left:0;pointer-events:none;z-index:0;overflow:visible}
 #wireBase{fill:none;stroke:var(--line);stroke-width:2}
 #wireHot{fill:none;stroke:var(--hv);stroke-width:2;filter:drop-shadow(0 0 3px rgba(255,77,0,.45))}
 #wireHead{fill:var(--hv);filter:drop-shadow(0 0 6px rgba(255,77,0,.9))}
 .wire-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;fill:var(--faint)}
 main,header,footer{position:relative;z-index:1}
-.eyebrow::before{transition:box-shadow .3s, background .3s}
+.eyebrow.lit{color:var(--hv)}
 .eyebrow.lit::before{background:var(--hv);box-shadow:0 0 10px rgba(255,77,0,.85);animation:flick .45s steps(3,end) 1}
-.eyebrow.lit{animation:flick .45s steps(3,end) 1}
 @keyframes flick{0%{opacity:.2}40%{opacity:1}60%{opacity:.4}100%{opacity:1}}
 @media(max-width:760px){#wireWrap{display:none}}
 
-/* ---------- AMR: follows the cursor, perceives obstacles ---------- */
-#amr{position:fixed;left:0;top:0;width:48px;height:48px;z-index:90;pointer-events:none;opacity:0;transition:opacity .5s;will-change:transform}
+/* ---------- AMR: lives on the page, steers around text, talks ---------- */
+#amr{position:absolute;left:0;top:0;width:48px;height:48px;z-index:60;pointer-events:none;opacity:0;transition:opacity .5s;will-change:transform}
 #amr.show{opacity:1}
 .amr-rot{position:absolute;inset:0}
 .amr-rot svg{overflow:visible;display:block}
@@ -69,8 +68,9 @@ main,header,footer{position:relative;z-index:1}
 #amr.detect .amr-scan{animation-duration:.55s;opacity:.9}
 #amr.idle .amr-cone{opacity:.06}
 #amr.idle .amr-scan{animation-duration:3.4s;opacity:.25}
-.amr-label{position:absolute;left:50%;top:-20px;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;color:var(--hv);white-space:nowrap;opacity:0;transition:opacity .2s}
-#amr.detect .amr-label{opacity:1}
+.amr-bubble{position:absolute;left:50%;bottom:58px;transform:translateX(-50%) translateY(5px);background:var(--ink);color:#fff;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.04em;line-height:1.4;padding:6px 11px;border-radius:9px;white-space:nowrap;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none}
+.amr-bubble::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--ink)}
+.amr-bubble.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .amr-toggle{cursor:pointer;background:none;border:none;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;padding:0}
 .amr-toggle:hover{color:var(--hv)}
 
@@ -92,8 +92,8 @@ header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,2
 main{max-width:var(--max);margin:0 auto;padding:0 28px}
 section{padding:88px 0;border-top:1px solid var(--line)}
 section:first-of-type{border-top:none}
-.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--hv);margin-bottom:26px;display:flex;align-items:center;gap:12px}
-.eyebrow::before{content:'';width:22px;height:2px;background:var(--hv)}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);margin-bottom:26px;display:flex;align-items:center;gap:12px;transition:color .35s}
+.eyebrow::before{content:'';width:22px;height:2px;background:var(--line);transition:background .35s,box-shadow .35s}
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
 .reveal.visible{opacity:1;transform:none}
 
@@ -217,18 +217,26 @@ footer{border-top:1px solid var(--line)}
 </head>
 <body>
 
-<!-- HV wire: energizes as you read, taps into each section -->
+<!-- HV wire: curved conductor, energizes as you read, fades behind the text column -->
 <svg id="wireWrap" aria-hidden="true" width="0" height="0">
-  <path id="wireBase" d=""/>
-  <path id="wireHot" d=""/>
+  <defs>
+    <mask id="wireMask" maskUnits="userSpaceOnUse">
+      <rect id="wmAll" fill="white" x="0" y="0" width="0" height="0"/>
+      <rect id="wmContent" fill="#4a4a4a" x="0" y="0" width="0" height="0"/>
+    </mask>
+  </defs>
+  <g mask="url(#wireMask)">
+    <path id="wireBase" d=""/>
+    <path id="wireHot" d=""/>
+  </g>
   <text id="wireTagTop" class="wire-tag">HV+</text>
   <text id="wireTagBot" class="wire-tag">HV−</text>
   <circle id="wireHead" r="4.5"/>
 </svg>
 
-<!-- AMR: follows the cursor at a safe standoff, perceives clickable obstacles -->
+<!-- AMR: lives on the page, holds standoff, steers around text, occasionally has opinions -->
 <div id="amr" aria-hidden="true">
-  <div class="amr-label">OBJECT DETECTED</div>
+  <div class="amr-bubble" id="amrBubble"></div>
   <div class="amr-rot">
     <svg viewBox="0 0 48 48" width="48" height="48">
       <defs>
@@ -563,7 +571,7 @@ document.querySelectorAll('.copy-email').forEach(function(b){
   });
 })();
 
-/* ---------- HV wire: routed through the page, energizes with scroll ---------- */
+/* ---------- HV wire: curved conductor woven through the page ---------- */
 (function(){
   var wrap = document.getElementById('wireWrap');
   var base = document.getElementById('wireBase');
@@ -571,6 +579,8 @@ document.querySelectorAll('.copy-email').forEach(function(b){
   var head = document.getElementById('wireHead');
   var tagT = document.getElementById('wireTagTop');
   var tagB = document.getElementById('wireTagBot');
+  var wmAll = document.getElementById('wmAll');
+  var wmC = document.getElementById('wmContent');
   if (!wrap) return;
   var anchors = [], samples = [], len = 0, built = false;
 
@@ -581,56 +591,83 @@ document.querySelectorAll('.copy-email').forEach(function(b){
     return { left: r.left + sx, top: r.top + sy, width: r.width, height: r.height };
   }
 
+  function catmull(p){
+    if (p.length < 2) return '';
+    var d = 'M ' + p[0].x.toFixed(1) + ' ' + p[0].y.toFixed(1);
+    for (var i = 0; i < p.length - 1; i++){
+      var p0 = p[i-1] || p[i], p1 = p[i], p2 = p[i+1], p3 = p[i+2] || p2;
+      var c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
+      var c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
+      d += ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ' ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
+    }
+    return d;
+  }
+
   function build(){
     if (window.innerWidth < 760) { wrap.style.display = 'none'; built = false; return; }
     wrap.style.display = 'block';
-    var H = document.body.scrollHeight;
-    wrap.setAttribute('width', window.innerWidth);
+    var H = document.body.scrollHeight, W = window.innerWidth;
+    wrap.setAttribute('width', W);
     wrap.setAttribute('height', H);
-    var main = document.querySelector('main');
-    var contentLeft = docRect(main).left + 28;
-    var gx = Math.max(10, contentLeft - 30);
 
-    var startEl = document.querySelector('.avail');
-    var sr = docRect(startEl);
-    var y0 = sr.top + sr.height / 2;
-    var d = 'M ' + gx + ' ' + y0;
+    var main = document.querySelector('main');
+    var mr = docRect(main);
+    var cL = mr.left + 28, cR = mr.left + mr.width - 28, cW = cR - cL;
+
+    // mask: full-bright everywhere, dimmed over the text column so the wire reads as "behind"
+    wmAll.setAttribute('width', W); wmAll.setAttribute('height', H);
+    wmC.setAttribute('x', cL - 4); wmC.setAttribute('y', mr.top);
+    wmC.setAttribute('width', cW + 8); wmC.setAttribute('height', mr.height);
+
+    var pts = [];
+    var sr = docRect(document.querySelector('.avail'));
+    pts.push({ x: Math.max(14, sr.left - 16), y: sr.top + sr.height / 2 });
+
+    var hi = document.querySelector('.hero-intro');
+    if (hi){ var hr = docRect(hi); pts.push({ x: cL + cW * 0.66, y: hr.top + hr.height * 0.45 }); }
+    var fc = document.querySelector('.facts');
+    if (fc){ var fr = docRect(fc); pts.push({ x: cL + cW * 0.28, y: fr.top + fr.height / 2 }); }
 
     anchors = [];
-    document.querySelectorAll('.eyebrow').forEach(function(eb){
+    var ebs = Array.prototype.slice.call(document.querySelectorAll('.eyebrow'));
+    ebs.forEach(function(eb, i){
       var r = docRect(eb);
-      var ay = r.top + r.height / 2;
-      var ax = r.left - 6;
-      d += ' L ' + gx + ' ' + ay + ' L ' + ax + ' ' + ay + ' L ' + gx + ' ' + ay;
-      anchors.push({ ebEl: eb, y: ay, s: null });
+      var p = { x: r.left + 10, y: r.top + r.height / 2 };
+      pts.push(p);
+      anchors.push({ ebEl: eb, x: p.x, y: p.y, s: 0 });
+      if (i < ebs.length - 1){
+        var r2 = docRect(ebs[i + 1]);
+        pts.push({ x: cL + cW * (i % 2 ? 0.44 : 0.80), y: (r.top + r2.top) / 2 });
+      }
     });
 
-    var endEl = document.querySelector('.big-mail');
-    var er = docRect(endEl);
-    var yE = er.top + er.height / 2;
-    d += ' L ' + gx + ' ' + yE + ' L ' + (er.left - 16) + ' ' + yE;
+    var er = docRect(document.querySelector('.big-mail'));
+    var endP = { x: Math.min(er.left + er.width + 34, cR + 20), y: er.top + er.height / 2 };
+    pts.push(endP);
 
+    var d = catmull(pts);
     base.setAttribute('d', d);
     hot.setAttribute('d', d);
     len = hot.getTotalLength();
     hot.style.strokeDasharray = len;
     hot.style.strokeDashoffset = len;
 
-    tagT.setAttribute('x', gx - 10); tagT.setAttribute('y', y0 - 14);
-    tagB.setAttribute('x', gx - 10); tagB.setAttribute('y', yE + 26);
+    tagT.setAttribute('x', pts[0].x - 10); tagT.setAttribute('y', pts[0].y - 16);
+    tagB.setAttribute('x', endP.x - 8);    tagB.setAttribute('y', endP.y + 28);
 
     samples = [];
-    var N = Math.max(220, Math.floor(len / 10));
+    var N = Math.max(260, Math.floor(len / 9));
     for (var i = 0; i <= N; i++){
       var s = len * i / N;
       var p = hot.getPointAtLength(s);
-      samples.push({ s: s, y: p.y });
+      samples.push({ s: s, x: p.x, y: p.y });
     }
     anchors.forEach(function(a){
-      for (var i = 0; i < samples.length; i++){
-        if (samples[i].y >= a.y - 3) { a.s = samples[i].s; break; }
-      }
-      if (a.s == null) a.s = len;
+      var bd = Infinity;
+      samples.forEach(function(sm){
+        var dx = sm.x - a.x, dy = sm.y - a.y, dd = dx*dx + dy*dy;
+        if (dd < bd){ bd = dd; a.s = sm.s; }
+      });
     });
     built = true;
     upd();
@@ -644,14 +681,14 @@ document.querySelectorAll('.copy-email').forEach(function(b){
     var targetY = sy + doc.clientHeight * 0.55;
     var s = 0;
     for (var i = 0; i < samples.length; i++){
-      if (samples[i].y <= targetY) s = samples[i].s; else break;
+      if (samples[i].y <= targetY && samples[i].s > s) s = samples[i].s;
     }
     if (max > 0 && sy >= max - 2) s = len;
     hot.style.strokeDashoffset = Math.max(0, len - s);
     var p = hot.getPointAtLength(s);
     head.setAttribute('cx', p.x);
     head.setAttribute('cy', p.y);
-    anchors.forEach(function(a){ a.ebEl.classList.toggle('lit', s >= a.s); });
+    anchors.forEach(function(a){ a.ebEl.classList.toggle('lit', s >= a.s - 2); });
   }
 
   window.addEventListener('scroll', upd, { passive: true });
@@ -665,31 +702,99 @@ document.querySelectorAll('.copy-email').forEach(function(b){
   setTimeout(build, 350);
 })();
 
-/* ---------- AMR: cursor follower with standoff + perception ---------- */
+/* ---------- AMR: page citizen — standoff, obstacle map, opinions ---------- */
 (function(){
   if (REDUCED) return;
   if (!window.matchMedia || !window.matchMedia('(pointer:fine)').matches) return;
   var amr = document.getElementById('amr');
   if (!amr) return;
   var rot = amr.querySelector('.amr-rot');
-  var x = innerWidth / 2, y = innerHeight + 80;   // drives in from below on first move
-  var mx = x, my = y, heading = -Math.PI / 2, lastMove = Date.now(), on = true, shown = false;
-  var STANDOFF = 78;
+  var bubble = document.getElementById('amrBubble');
+  var on = true, shown = false, avoiding = false;
+  var x = 0, y = 0, heading = -Math.PI / 2;
+  var cxv = innerWidth / 2, cyv = innerHeight / 2;   // cursor, viewport coords
+  var lastMove = Date.now();
+  var STAND = 80;
+  var obstacles = [];
+
+  function sX(){ return window.scrollX || 0; }
+  function sY(){ return window.scrollY || document.documentElement.scrollTop; }
+
+  function collect(){
+    obstacles = [];
+    var sx = sX(), sy = sY();
+    document.querySelectorAll('h1,h2,p,li,.facts,.btn,.big-mail,.h1b').forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.width < 36 || r.height < 14) return;
+      obstacles.push({ l: r.left + sx - 10, t: r.top + sy - 8, r: r.right + sx + 10, b: r.bottom + sy + 8 });
+    });
+  }
+
+  /* speech */
+  var sayT = null, cool = {};
+  var COOLDOWN = { detect: 6000, avoid: 8000, fast: 7000, catchup: 9000, idle: 20000, ambient: 30000, intro: 1e9, follow: 1e9 };
+  var LINES = {
+    intro:   ['hey. planning a route to your cursor…'],
+    follow:  ['following you — at a safe standoff, obviously'],
+    fast:    ['whoa, slow down mate', 'easy on the throttle', "my localization can't keep up"],
+    catchup: ['oi, wait for me…', 'recalculating — you moved the whole map'],
+    avoid:   ['rerouting around the text', 'not driving over the resume', 'obstacle map says go around'],
+    detect:  ['object detected: clickable', "perception says that's a link", 'target: button. engaging'],
+    idle:    ['entering standby…', 'low power mode. wiggle to wake me'],
+    ambient: ['all systems nominal', 'SOC 87% · vibes 100%', 'SIL2-certified cursor follower', 'this portfolio passed my V&V']
+  };
+  function say(cat, ms){
+    var now = Date.now();
+    if (cool[cat] && now - cool[cat] < (COOLDOWN[cat] || 8000)) return;
+    cool[cat] = now;
+    var arr = LINES[cat];
+    bubble.textContent = arr[Math.floor(Math.random() * arr.length)];
+    bubble.classList.add('show');
+    clearTimeout(sayT);
+    sayT = setTimeout(function(){ bubble.classList.remove('show'); }, ms || 2500);
+  }
 
   document.addEventListener('mousemove', function(e){
-    mx = e.clientX; my = e.clientY; lastMove = Date.now();
-    if (!shown){ shown = true; x = mx; y = Math.min(innerHeight - 40, my + 160); amr.classList.add('show'); }
+    cxv = e.clientX; cyv = e.clientY; lastMove = Date.now();
+    if (!shown){
+      shown = true;
+      x = cxv + sX();
+      y = cyv + sY() + 240;        // drives in from below its goal
+      amr.classList.add('show');
+      collect();
+      say('intro', 2600);
+      setTimeout(function(){ say('follow', 2400); }, 3600);
+    }
   });
   document.addEventListener('mouseover', function(e){
     var t = e.target && e.target.closest ? e.target.closest('a,button,summary') : null;
     amr.classList.toggle('detect', !!t);
+    if (t && shown) say('detect');
   });
+
+  /* scroll: the robot is page-anchored, so it rides with the page, then chases */
+  var lastS = sY(), lastT = Date.now();
+  window.addEventListener('scroll', function(){
+    var now = Date.now(), s = sY();
+    var v = Math.abs(s - lastS) / Math.max(16, now - lastT) * 1000;
+    lastS = s; lastT = now;
+    if (!shown) return;
+    if (v > 3200) say('fast');
+    else if (v > 1500) say('catchup');
+  }, { passive: true });
+
   var toggle = document.getElementById('amrToggle');
   if (toggle) toggle.addEventListener('click', function(){
     on = !on;
     amr.style.display = on ? 'block' : 'none';
     toggle.textContent = 'AMR: ' + (on ? 'ON' : 'OFF');
   });
+  window.addEventListener('resize', function(){ if (shown) collect(); });
+  document.querySelectorAll('details').forEach(function(d){
+    d.addEventListener('toggle', function(){ setTimeout(collect, 90); });
+  });
+  setInterval(function(){ if (shown && on) collect(); }, 2500);
+  setInterval(function(){ if (shown && on && Date.now() - lastMove > 14000) say('ambient'); }, 16000);
 
   function angDiff(a, b){
     var d = a - b;
@@ -701,17 +806,38 @@ document.querySelectorAll('.copy-email').forEach(function(b){
   (function loop(){
     requestAnimationFrame(loop);
     if (!on || !shown) return;
-    var dx = mx - x, dy = my - y;
+    var tx = cxv + sX(), ty = cyv + sY();   // cursor in document coords
+    var dx = tx - x, dy = ty - y;
     var dist = Math.hypot(dx, dy);
     if (dist > 0.5){
       var ux = dx / dist, uy = dy / dist;
-      // hold a safety standoff from the cursor, like a real AMR
-      var goal = Math.max(0, dist - STANDOFF);
-      x += ux * goal * 0.085;
-      y += uy * goal * 0.085;
+      var goal = Math.max(0, dist - STAND);
+      x += ux * Math.min(goal * 0.085, 13);
+      y += uy * Math.min(goal * 0.085, 13);
       heading += angDiff(Math.atan2(dy, dx), heading) * 0.14;
     }
-    amr.classList.toggle('idle', Date.now() - lastMove > 4000);
+    /* steer out of text blocks */
+    var hit = false;
+    for (var i = 0; i < obstacles.length; i++){
+      var o = obstacles[i];
+      if (x > o.l && x < o.r && y > o.t && y < o.b){
+        hit = true;
+        var pl = x - o.l, pr = o.r - x, pt = y - o.t, pb = o.b - y;
+        var m = Math.min(pl, pr, pt, pb);
+        if (m === pl)      x -= Math.min(pl, 6);
+        else if (m === pr) x += Math.min(pr, 6);
+        else if (m === pt) y -= Math.min(pt, 6);
+        else               y += Math.min(pb, 6);
+      }
+    }
+    if (hit && !avoiding){ avoiding = true; say('avoid'); }
+    if (!hit) avoiding = false;
+    /* keep it on the page */
+    x = Math.max(26, Math.min(document.body.scrollWidth - 26, x));
+    y = Math.max(26, Math.min(document.body.scrollHeight - 26, y));
+    var idle = Date.now() - lastMove > 5000;
+    amr.classList.toggle('idle', idle);
+    if (idle) say('idle');
     amr.style.transform = 'translate(' + (x - 24) + 'px,' + (y - 24) + 'px)';
     rot.style.transform = 'rotate(' + (heading * 180 / Math.PI + 90) + 'deg)';
   })();
