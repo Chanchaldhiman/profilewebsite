@@ -84,8 +84,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,2
 .hd-link::after{content:'';position:absolute;left:0;bottom:-3px;height:1.5px;width:0;background:var(--hv);transition:width .22s}
 .hd-link:hover{color:var(--ink)}
 .hd-link:hover::after{width:100%}
-.hd-cta{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;background:var(--ink);color:#fff;padding:9px 18px;border-radius:100px;transition:background .2s}
-.hd-cta:hover{background:var(--hv)}
 @media(max-width:640px){.hd-link.opt{display:none}}
 
 /* ---------- layout ---------- */
@@ -192,7 +190,7 @@ h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(1.7rem,4vw,2
 .mail-sub{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:14px}
 .contact-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:44px}
 footer{border-top:1px solid var(--line)}
-.ft{max-width:var(--max);margin:0 auto;padding:26px 28px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.ft{max-width:var(--max);margin:0 auto;padding:26px 28px;display:flex;justify-space-between;gap:14px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 .ft i{font-style:normal;color:var(--hv)}
 
 /* ---------- command palette + toast ---------- */
@@ -256,7 +254,6 @@ footer{border-top:1px solid var(--line)}
       <a class="hd-link opt" href="#experience">Experience</a>
       <a class="hd-link opt" href="#projects">Projects</a>
       <button class="hd-link opt copy-email" type="button">Copy email</button>
-      <a class="hd-cta resume-link" href="resume.pdf" download>Resume ↓</a>
     </nav>
   </div>
 </header>
@@ -270,9 +267,9 @@ footer{border-top:1px solid var(--line)}
     <p class="hero-role reveal visible">Lead Systems &amp; Functional Safety Architect <span>- ISO 26262, IEC 61508, MBSE &amp; EV Powertrains.</span></p>
     <p class="hero-intro reveal visible">Six years taking electric machines and safety-critical mechatronics from Simulink model to production floor. Currently leading functional safety and mechatronic system architecture at Tennant Company; authoring complete ISO 26262 and IEC 61508 safety cases, executing quantitative FMEDA/FTA risk analyses, and engineering fail-safe control platforms.</p>
     <div class="hero-ctas reveal visible">
-      <a class="btn resume-link" href="resume.pdf" download>Download resume</a>
-      <button class="btn ghost copy-email" type="button">Copy email</button>
+      <button class="btn copy-email" type="button">Copy email</button>
       <a class="btn ghost" href="https://www.linkedin.com/in/chanchaldhiman/" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a class="btn ghost" href="https://github.com/Chanchaldhiman" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
     <p class="hero-hint reveal visible">Press <kbd>/</kbd> anywhere to jump around</p>
 
@@ -316,9 +313,9 @@ footer{border-top:1px solid var(--line)}
       </summary>
       <div class="xp-body"><span class="spacer"></span><div>
         <ul class="xp-pts">
-          <li>Spearheaded end-to-end EV platform architecture for next-gen industrial vehicles, defining system requirements, high-voltage battery topology, and inverter integration.</li>
+          <li>Spearheaded end-to-end EV platform architecture for next-gen industrial vehicles, defining system requirements, high-voltage battery topology, e-motor selection, and inverter integration.</li>
           <li>Architected dual-channel steer-by-wire controls certified to IEC 61508 SIL2 and ISO 13849 PLd, defining safety mechanisms and executing hazard mitigation.</li>
-          <li>Designed closed-loop motor control in MATLAB/Simulink and validated performance against drivetrain targets via Hardware-in-the-Loop (HIL) fault injection.</li>
+          <li>Designed closed-loop motor control algorithms in MATLAB/Simulink and verified driveability targets using Hardware-in-the-Loop (HIL) fault-injection testing.</li>
           <li>Executed trade studies for wireless power transfer on autonomous mobile robots (AGVs): evaluated transfer efficiency, thermal dissipation, and foreign object detection.</li>
           <li>Implemented CANopen across multi-node EV platforms, building motion-control sequences on CiA 402 state machines for coordinated drive behaviour.</li>
           <li>Engineered Python test automation with Azure-connected pipelines and Power BI dashboards for real-time fleet diagnostic visibility.</li>
@@ -488,7 +485,7 @@ footer{border-top:1px solid var(--line)}
     <button class="big-mail copy-email reveal" type="button" aria-label="Copy email address">cdhiman<span class="at">@</span>mtu.edu</button>
     <p class="mail-sub reveal">Click to copy · or <a href="mailto:cdhiman@mtu.edu" style="color:var(--hv)">open your mail app</a></p>
     <div class="contact-row reveal">
-      <a class="btn resume-link" href="resume.pdf" download>Download resume</a>
+      <button class="btn copy-email" type="button">Copy email</button>
       <a class="btn ghost" href="https://www.linkedin.com/in/chanchaldhiman/" target="_blank" rel="noopener">LinkedIn ↗</a>
       <a class="btn ghost" href="https://github.com/Chanchaldhiman" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
@@ -508,7 +505,7 @@ footer{border-top:1px solid var(--line)}
   <div class="cp-box">
     <div class="cp-input-wrap">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9A9EA4" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="cpInput" type="text" placeholder="Jump to a section, copy email, get the resume…" autocomplete="off"/>
+      <input id="cpInput" type="text" placeholder="Jump to a section, copy email, search projects…" autocomplete="off"/>
       <span class="cp-esc">esc</span>
     </div>
     <div class="cp-list" id="cpList"></div>
@@ -544,24 +541,6 @@ function copyEmail(){
 document.querySelectorAll('.copy-email').forEach(function(b){
   b.addEventListener('click', copyEmail);
 });
-
-/* ---------- resume guard: explain missing resume.pdf instead of downloading a 404 page ---------- */
-(function(){
-  var checked = null;
-  document.querySelectorAll('.resume-link').forEach(function(a){
-    a.addEventListener('click', function(e){
-      if (location.protocol === 'file:' || checked === true) return;
-      e.preventDefault();
-      var go = function(){ window.location.href = a.getAttribute('href'); };
-      if (checked === false) { toast('resume.pdf is missing - add it to the repo root next to index.html'); return; }
-      fetch('resume.pdf', { method:'HEAD' }).then(function(r){
-        var type = (r.headers.get('content-type') || '').toLowerCase();
-        if (r.ok && type.indexOf('pdf') !== -1) { checked = true; go(); }
-        else { checked = false; toast('resume.pdf is missing - add it to the repo root next to index.html'); }
-      }).catch(go);
-    });
-  });
-})();
 
 /* ---------- HV wire: routed through the page, energizes with scroll ---------- */
 (function(){
@@ -735,10 +714,10 @@ document.querySelectorAll('.copy-email').forEach(function(b){
 
   function go(hash){ close(); var t = document.querySelector(hash); if (t) t.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' }); }
   var items = [
-    { label:'Download resume (PDF)', hint:'resume',  act:function(){ close(); var l = document.querySelector('.resume-link'); if (l) l.click(); } },
     { label:'Copy email address',    hint:EMAIL,     act:function(){ close(); copyEmail(); } },
     { label:'Open LinkedIn',         hint:'new tab', act:function(){ close(); window.open('https://www.linkedin.com/in/chanchaldhiman/','_blank'); } },
     { label:'CANviz on GitHub',      hint:'new tab', act:function(){ close(); window.open('https://github.com/Chanchaldhiman/CANviz','_blank'); } },
+    { label:'DSM Optimizer on GitHub', hint:'new tab', act:function(){ close(); window.open('https://github.com/Chanchaldhiman/dsm-optimizer','_blank'); } },
     { label:'Experience',            hint:'section', act:function(){ go('#experience'); } },
     { label:'Projects',              hint:'section', act:function(){ go('#projects'); } },
     { label:'Education',             hint:'section', act:function(){ go('#education'); } },
@@ -751,7 +730,7 @@ document.querySelectorAll('.copy-email').forEach(function(b){
     filtered = items.filter(function(it){ return !q || (it.label + ' ' + it.hint).toLowerCase().indexOf(q) !== -1; });
     if (sel >= filtered.length) sel = Math.max(0, filtered.length - 1);
     if (!filtered.length){
-      list.innerHTML = '<div class="cp-empty">Nothing matches. Try "resume" or "email".</div>';
+      list.innerHTML = '<div class="cp-empty">Nothing matches. Try "email" or "projects".</div>';
       return;
     }
     list.innerHTML = filtered.map(function(it, i){
